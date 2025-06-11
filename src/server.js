@@ -4,7 +4,6 @@ const { swaggerSpec } = require('./docs/swaggerSpec');
 const salesRoutes = require('./routes/salesRoutes');
 
 const app = express();
-const PORT = 3001;
 
 app.use(express.json());
 
