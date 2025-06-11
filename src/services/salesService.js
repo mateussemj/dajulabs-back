@@ -1,25 +1,45 @@
 const path = require('path');
 const { readCSV } = require('../utils/csvReader');
 const { normalizeCSV } = require('../utils/normalizeData');
+const { Transaction} = require('../models/Transaction');
+const { TransactionPair } = require('../models/TransactionPair');
 
 async function searchReturnedProducts() {
-    console.log("Iniciando busca por produtos devolvidos...");
-  const sales = await readCSV(path.join(__dirname, '../data/sales_and_reversals.csv'));
+  console.log("INICIANDO BUSCA")
+  const data = await readCSV(path.join(__dirname, '../data/sales_and_reversals.csv'));
+  const normalized = normalizeCSV(data);
+  const transactions = normalized.map(sale => new Transaction(sale));
 
-  const normalized = normalizeCSV(sales)
+  const refundsMap = new Map();
 
-  console.log("Normalized Sales:", normalized.length);
+  const salesOnly = transactions.filter(t => !t.isReversal);
+  console.log("vendas ", salesOnly.length)
+  const refundsOnly = transactions.filter(t => t.isReversal);
+  console.log("reembolsos ", refundsOnly.length)
 
-  const returnedProducts = normalized.filter(sale => sale.in_estorno);
-  const returnedCdProducts = new Set(returnedProducts.map(p => p.cd_produto))
+  for (const refund of refundsOnly) {
+    const key = `${refund.product}-${refund.invoice}`;
+    if (!refundsMap.has(key)) {
+      refundsMap.set(key, []);
+    }
+    refundsMap.get(key).push(refund);
+  }
 
-  const matchingOriginalSales = normalized.filter(sale => !sale.in_estorno && returnedCdProducts.has(sale.cd_produto));
+  const result = [];
 
-  console.log("Produtos devolvidos:", returnedProducts.length);
-  console.log("Vendas originais correspondentes:", matchingOriginalSales.length);
+  for (const sale of salesOnly) {
+    const key = `${sale.product}-${sale.invoice}`;
+    const refunds = refundsMap.get(key);
 
+    if (refunds && refunds.length > 0) {
+      console.log("Encontrado reembolso para venda", sale.invoice, sale.product);
+      const refund = refunds.shift();
+      console.log("Novo par encontrado", sale, refund)
+      result.push(new TransactionPair(sale, refund).toJSON());
+    }
+  }
 
-  return {returnedProducts, matchingOriginalSales};
+  return result;
 }
 
 module.exports = { searchReturnedProducts };
