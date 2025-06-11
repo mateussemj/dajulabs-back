@@ -12,7 +12,4 @@ app.get('/', (req, res) => {
 
 app.use('/api/vendas', salesRoutes)
 
-
-app.listen(PORT, () => {
-  console.log(`Servidor backend rodando em http://localhost:${PORT}`);
-});
+module.exports = app;

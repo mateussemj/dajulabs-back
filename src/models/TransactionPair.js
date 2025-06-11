@@ -10,7 +10,7 @@ class TransactionPair {
   toJSON() {
     return {
       invoice: this.invoice,
-      transacation: {
+      transaction: {
         sale: {
           product: this.transaction.sale.product,
           company: this.transaction.sale.company,
