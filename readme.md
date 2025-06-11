@@ -9,8 +9,8 @@ Este projeto é uma API desenvolvida em **Node.js + Express**, com leitura de ar
 ### 1. Clonar o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/seu-repositorio.git
-cd seu-repositorio
+git clone https://github.com/mateussemj/dajulabs-back.git
+cd dajulabs-back
 ```
 
 ### 2. Instalar as dependências

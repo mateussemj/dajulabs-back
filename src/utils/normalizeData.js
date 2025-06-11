@@ -1,5 +1,4 @@
 function normalizeCSV(csv) {
-  console.log("Normalizando CSV", csv.length, "linhas");
   return csv.map(sale => ({
     product: sale.cd_produto,
     company: sale.cd_empresa,
